@@ -1,0 +1,81 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Banner</title>
+    <style>
+        /* Banner Container */
+        .banner {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            background-size: cover;
+            background-position: center;
+            color: white;
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            padding: 0 20px;
+            background-image: url('https://linhhandmade.com/assets/upload/619350a8b6b86-16-11-2021.png');
+        }
+
+        /* Overlay Effect */
+        .banner-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4); /* Adds dark overlay to enhance text visibility */
+        }
+
+        /* Banner Text */
+        .banner-text {
+            z-index: 1;
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        /* Breadcrumb */
+        .breadcrumb {
+            z-index: 1;
+            margin-top: 10px;
+            font-size: 1rem;
+        }
+
+        .breadcrumb a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        .breadcrumb a:hover {
+            text-decoration: underline;
+        }
+
+        .sorting {
+            z-index: 1;
+            position: absolute;
+            right: 20px;
+            top: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <!-- Banner Section -->
+    <div class="banner">
+        <div class="banner-overlay"></div>
+        <div class="banner-text">
+            <h1>LS Len</h1>
+            <div class="breadcrumb">
+            </div>
+        </div>
+    </div>
+</body>
+</html>

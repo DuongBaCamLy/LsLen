@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LS Len</title>
+    <link rel="stylesheet" type="text/css" href="CSS/styles.css">
+    <title>Giỏ hàng</title>
+    <style>
+        body { 
+            font-family: Arial, sans-serif; 
+            margin: 20px; 
+        }
+        .general{
+            display:flex;
+        }
+        .one{
+            width: 50%;
+        }
+        table { 
+            width: 100%; 
+            border-collapse: collapse; 
+            margin-top: 20px; 
+        }
+        th, td { 
+            padding: 10px; 
+            border-bottom: 1px solid #ddd; 
+            text-align: left; 
+        }
+        .product-img { 
+            width: 60px; 
+        }
+        .cart-buttons button { 
+            padding: 10px 20px; 
+            margin: 10px 5px; 
+            cursor: pointer; 
+        }
+       
+        .total-section { 
+            margin-top: 30px; 
+            width:50%;
+            padding-left: 200px;
+        }
+        .remove-btn { 
+            color: red; 
+            cursor: pointer; 
+            font-weight: bold; 
+        }
+        input[type="number"] { 
+            width: 50px; 
+            text-align: center; 
+        }
+        .proceed-btn { 
+            background-color: black; 
+            color: white; 
+            padding: 12px 25px; 
+            border: none; 
+            cursor: pointer; 
+        }
+        .cart-buttons{
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+ <!-- Header được load tự động -->
+ <div id="header-placeholder"></div>
+<form onsubmit="return false;">
+ <div class="general">
+   <div class="one">
+    <table>
+        <tr>
+            <th>PRODUCT</th>
+            <th>PRICE</th>
+            <th>QUANTITY</th>
+            <th>SUBTOTAL</th>
+             
+        </tr>
+        <tbody id="cart-body"></tbody>
+    </table>
+   </div>
+    <!-- Tổng tiền -->
+    <div class="total-section">
+        <p><strong>Subtotal:</strong> 419.000₫</p>
+        <p><strong>Total:</strong> 419.000₫</p>
+        <button class="proceed-btn" onclick="location.href='Checkout.html'">PROCEED TO CHECKOUT</button>
+    </div>
+ </div>
+    <div class="cart-buttons">
+        <button type="button" onclick="location.href='decoration.html'">← CONTINUE SHOPPING</button>
+        <button type="submit">UPDATE CART</button>
+    </div>
+</form>
+<!-- Footer được load tự động -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Load script tái sử dụng header/footer -->
+    <script src="JS/common.js"></script>
+    <script>
+function formatCurrency(amount) {
+    return amount.toLocaleString('vi-VN') + '₫';
+}
+
+function renderCart() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const tbody = document.getElementById("cart-body");
+    const totalSection = document.querySelector(".total-section");
+    let total = 0;
+    tbody.innerHTML = '';
+
+    if (cart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="4">Giỏ hàng của bạn trống.</td></tr>';
+        totalSection.innerHTML = '<p><strong>Total:</strong> 0₫</p>';
+        return;
+    }
+
+    cart.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><img src="${item.image}" class="product-img" /> ${item.name}</td>
+            <td>${formatCurrency(item.price)}</td>
+            <td><input type="number" min="1" value="${item.quantity}" data-index="${index}" onchange="updateQuantity(this)"/></td>
+            <td>${formatCurrency(subtotal)}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    totalSection.innerHTML = `
+        <p><strong>Subtotal:</strong> ${formatCurrency(total)}</p>
+        <p><strong>Total:</strong> ${formatCurrency(total)}</p>
+        <button class="proceed-btn" onclick="location.href='checkout.html'">PROCEED TO CHECKOUT</button>
+    `;
+}
+
+function updateQuantity(input) {
+    const index = input.getAttribute('data-index');
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart[index].quantity = parseInt(input.value);
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+}
+
+window.onload = renderCart;
+function renderCart() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const tbody = document.getElementById("cart-body");
+    const totalSection = document.querySelector(".total-section");
+    let total = 0;
+    tbody.innerHTML = '';
+
+    if (cart.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5">Giỏ hàng của bạn trống.</td></tr>';
+        totalSection.innerHTML = '<p><strong>Total:</strong> 0₫</p>';
+        return;
+    }
+
+    cart.forEach((item, index) => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td><img src="${item.image}" class="product-img" /> ${item.name}</td>
+            <td>${formatCurrency(item.price)}</td>
+            <td><input type="number" min="1" value="${item.quantity}" data-index="${index}" onchange="updateQuantity(this)"/></td>
+            <td>${formatCurrency(subtotal)}</td>
+            <td><span class="remove-btn" onclick="removeItem(${index})">X</span></td>
+        `;
+        tbody.appendChild(tr);
+    });
+
+    totalSection.innerHTML = `
+        <p><strong>Subtotal:</strong> ${formatCurrency(total)}</p>
+        <p><strong>Total:</strong> ${formatCurrency(total)}</p>
+        <button class="proceed-btn" onclick="location.href='checkout.html'">PROCEED TO CHECKOUT</button>
+    `;
+}
+function removeItem(index) {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    cart.splice(index, 1); // Xoá sản phẩm tại vị trí index
+    localStorage.setItem("cart", JSON.stringify(cart));
+    renderCart(); // Render lại giao diện
+}
+
+
+</script>
+
+</body>
+</html>

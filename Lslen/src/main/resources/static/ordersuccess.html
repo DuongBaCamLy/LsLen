@@ -1,0 +1,151 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Order Success</title>
+    <link rel="stylesheet" type="text/css" href="CSS/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background-color: #f9f9f9; }
+        .order-container {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            margin-top: 100px;
+            margin-bottom: 100px;
+        }
+        .order-details, .order-summary {
+            background: white;
+            padding: 25px 30px;
+            border: 1px solid #ccc;
+            flex: 1;
+            min-width: 300px;
+        }
+        h3 { color: #f9a825; margin-top: 0; }
+        .success-msg {
+            background: #e7f7e7;
+            border-left: 6px solid #4CAF50;
+            padding: 20px;
+        }
+        .success-msg strong {
+            color: #2e7d32;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        th { text-align: left; }
+        .order-summary li {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+ <!-- Header được load tự động -->
+ <div id="header-placeholder"></div>
+
+<div class="order-container">
+
+    <!-- LEFT: Order Detail Table -->
+    <div class="order-details">
+        <h3>Order details</h3>
+        <table>
+            <tr>
+                <th>PRODUCT</th>
+                <th>TOTAL</th>
+            </tr>
+            <tr>
+                <td>Dê nhồi bông đáng yêu handmade × 1</td>
+                <td>89.000₫</td>
+            </tr>
+            <tr>
+                <td><strong>Subtotal:</strong></td>
+                <td>89.000₫</td>
+            </tr>
+            <tr>
+                <td><strong>Payment method:</strong></td>
+                <td>Trả tiền mặt khi nhận hàng</td>
+            </tr>
+            <tr>
+                <td><strong>Total:</strong></td>
+                <td><strong>89.000₫</strong></td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- RIGHT: Confirmation Summary -->
+    <div class="order-summary">
+        <div class="success-msg">
+            <p><strong>Thank you. Your order has been received.</strong></p>
+        </div>
+        <ul>
+            <li>Order number: <strong>1217</strong></li>
+            <li>Date: <strong>04/05/2025</strong></li>
+            <li>Total: <strong>89.000₫</strong></li>
+            <li>Payment method: <strong>Trả tiền mặt khi nhận hàng</strong></li>
+        </ul>
+    </div>
+</div>
+<!-- Footer được load tự động -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Load script tái sử dụng header/footer -->
+    <script src="JS/common.js"></script>
+    <script>
+window.onload = function () {
+    const encoded = localStorage.getItem("lastOrder");
+    if (!encoded) return;
+
+    const data = JSON.parse(decodeURIComponent(encoded));
+    const { order, orderDetails, paymentMethod } = data;
+
+    const detailsTable = document.querySelector(".order-details table");
+    const summaryList = document.querySelector(".order-summary ul");
+
+    let total = 0;
+    let rows = `
+        <tr>
+            <th>PRODUCT</th>
+            <th>TOTAL</th>
+        </tr>
+    `;
+
+    orderDetails.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+        rows += `
+            <tr>
+                <td>${item.product?.name || "Sản phẩm"} × ${item.quantity}</td>
+                <td>${subtotal.toLocaleString('vi-VN')}₫</td>
+            </tr>
+        `;
+    });
+
+    rows += `
+        <tr><td><strong>Subtotal:</strong></td><td>${total.toLocaleString('vi-VN')}₫</td></tr>
+        <tr><td><strong>Payment method:</strong></td><td>${paymentMethod}</td></tr>
+        <tr><td><strong>Total:</strong></td><td><strong>${total.toLocaleString('vi-VN')}₫</strong></td></tr>
+    `;
+
+    detailsTable.innerHTML = rows;
+
+    const today = new Date();
+    const formattedDate = today.toLocaleDateString("vi-VN");
+
+    summaryList.innerHTML = `
+        <li>Order number: <strong>#${Math.floor(1000 + Math.random() * 9000)}</strong></li>
+        <li>Date: <strong>${formattedDate}</strong></li>
+        <li>Total: <strong>${total.toLocaleString('vi-VN')}₫</strong></li>
+        <li>Payment method: <strong>${paymentMethod}</strong></li>
+    `;
+
+    localStorage.removeItem("lastOrder");
+};
+</script>
+
+
+</html>

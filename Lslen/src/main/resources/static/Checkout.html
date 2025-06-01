@@ -1,0 +1,317 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Checkout</title>
+    <meta charset="UTF-8">
+    <title>Wool Turtle Neck Knit</title>
+     <link rel="stylesheet" type="text/css" href="CSS/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; 
+               margin: 40px; 
+               background: #f9f9f9; }
+        .checkout-container { 
+            display: flex; 
+            gap: 40px; 
+            flex-wrap: wrap; 
+            margin-top: 100px;
+            margin-bottom: 100px;
+        }
+        .billing, .order-summary {
+            background: white;
+            padding: 30px;
+            border: 1px solid #ccc;
+            flex: 1;
+            min-width: 300px;
+        }
+        .order-summary{
+            height: 500px;
+        }
+        h3 { 
+            color: #f9a825; 
+            margin-top: 0; }
+        input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%; 
+            padding: 10px; 
+            margin: 8px 0 20px 0;
+            border: 1px solid #ccc; 
+            border-radius: 4px;
+        }
+        .form-group { 
+            margin-bottom: 15px; 
+        }
+        .order-summary table { 
+            width: 100%; 
+            border-collapse: collapse; 
+        }
+        .order-summary th, .order-summary td {
+            padding: 10px 0;
+            text-align: left;
+        }
+        .order-summary th { 
+            border-bottom: 1px solid #ddd; 
+        }
+        .place-order {
+            background: black; 
+            color: white; 
+            padding: 12px; 
+            border: none;
+            width: 100%; 
+            font-weight: bold; 
+            margin-top: 20px; 
+            cursor: pointer;
+        }
+        .radio-group { 
+            margin: 10px 0; 
+        }
+        textarea {
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 4px; 
+            border: 1px solid #ccc;
+        }
+    </style>
+</head>
+<body>
+<!-- Header được load tự động -->
+<div id="header-placeholder"></div>
+
+<div class="checkout-container">
+
+    <!-- BILLING DETAILS -->
+    <div class="billing">
+        <h3>BILLING DETAILS</h3>
+        <form>
+            <div class="form-group">
+                <label>Full name *</label>
+                <input type="text" name="fullName" id="fullName" value="" required />
+            </div>
+            <div class="form-group">
+                <label>Country / Region *</label>
+                <input type="text" name="country" id="country" value="" required />
+            </div>
+            <div class="form-group">
+                <label>Street address *</label>
+                <input type="text" name="street" id="street" value="" required />
+                <input type="text" name="apartment" id="apartment" placeholder="Apartment, suite, unit, etc. (optional)" />
+            </div>
+            <div class="form-group">
+                <label>Postcode / ZIP (optional)</label>
+                <input type="text" id="postcode" name="postcode" />
+            </div>
+            <div class="form-group">
+                <label>City *</label>
+                <input type="text" name="city" id="city" value="" required />
+            </div>
+            <div class="form-group">
+                <label>Phone *</label>
+                <input type="tel" name="phone" id="phone" value="" required />
+            </div>
+            <div class="form-group">
+                <label>Email address *</label>
+                <input type="email" name="email" id="email" value="" required />
+            </div>
+            <h4>ADDITIONAL INFORMATION</h4>
+            <div class="form-group">
+                <label>Order notes (optional)</label>
+                <textarea name="notes" id="notes" rows="4" placeholder="Notes about your order, e.g. special notes for delivery."></textarea>
+            </div>
+        </form>
+    </div>
+
+    <!-- ORDER SUMMARY -->
+    <div class="order-summary">
+        <h3>YOUR ORDER</h3>
+        <table id="order-items">
+            <tr>
+                <th>PRODUCT</th>
+                <th>SUBTOTAL</th>
+            </tr>
+            <!-- JS sẽ thêm dòng vào đây -->
+        </table>
+
+    <div class="radio-group">
+        <label><input type="radio" name="payment" value="Chuyển khoản ngân hàng" checked /> Chuyển khoản ngân hàng</label><br/>
+        <label><input type="radio" name="payment" value="Trả tiền mặt khi nhận hàng" /> Trả tiền mặt khi nhận hàng</label>
+    </div>
+    <div id="bank-transfer-info" style="display:none; margin-top: 15px; padding: 15px; background: #f0f0f0; border-left: 4px solid #f9a825;">
+        <p><strong>Ngân hàng:</strong> TP-BANK</p>
+        <p><strong>Số tài khoản:</strong> 0388846637</p>
+        <p><strong>Chủ tài khoản:</strong> Duong Ba Cam Ly</p>
+        <p id="transfer-note"><strong>Nội dung chuyển khoản:</strong> Thanh toan don hang - [Họ tên khách]</p>
+    </div>
+
+
+        <button class="place-order" onclick="submitOrder()">PLACE ORDER</button>
+        <p style="font-size: 13px; margin-top: 15px;">
+            Quý khách hàng vui lòng đọc kỹ chính sách Giao hàng và thanh toán tại<br/>
+            Quy định vận chuyển của Halona Fruits. Trân trọng!
+        </p>
+    </div>
+</div>
+<!-- Footer được load tự động -->
+    <div id="footer-placeholder"></div>
+
+    <!-- Load script tái sử dụng header/footer -->
+    <script src="JS/common.js"></script>
+<script>
+function formatCurrency(amount) {
+    return amount.toLocaleString('vi-VN') + '₫';
+}
+
+function renderOrderSummary() {
+    const cart = JSON.parse(localStorage.getItem("cart")) || [];
+    const table = document.getElementById("order-items");
+    let total = 0;
+
+    table.innerHTML = `
+        <tr>
+            <th>PRODUCT</th>
+            <th>SUBTOTAL</th>
+        </tr>
+    `;
+
+    cart.forEach(item => {
+        const subtotal = item.price * item.quantity;
+        total += subtotal;
+
+        const row = document.createElement("tr");
+        row.innerHTML = `
+            <td>${item.name} × ${item.quantity}</td>
+            <td>${formatCurrency(subtotal)}</td>
+        `;
+        table.appendChild(row);
+    });
+
+    const subtotalRow = document.createElement("tr");
+    subtotalRow.innerHTML = `
+        <th>Subtotal</th>
+        <td>${formatCurrency(total)}</td>
+    `;
+    table.appendChild(subtotalRow);
+
+    const totalRow = document.createElement("tr");
+    totalRow.innerHTML = `
+        <th>Total</th>
+        <td><strong>${formatCurrency(total)}</strong></td>
+    `;
+    table.appendChild(totalRow);
+}
+
+function updateTransferNote() {
+    const fullName = document.getElementById("fullName").value.trim() || "[Full Name]";
+    document.getElementById("transfer-note").innerHTML =
+        "<strong>Content:</strong> Order Payment - " + fullName;
+}
+
+function submitOrder() {
+    const cart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+    const paymentMethod = document.querySelector('input[name="payment"]:checked')?.value || "Không rõ";
+
+    const order = {
+        user: { id: 1 },
+        shippingAddress: document.getElementById('street').value + ", " +
+                         document.getElementById('apartment').value + ", " +
+                         document.getElementById('city').value,
+        fullName: document.getElementById('fullName').value,
+        country: document.getElementById('country').value,
+        street: document.getElementById('street').value,
+        apartment: document.getElementById('apartment').value,
+        postcode: document.getElementById('postcode').value,
+        city: document.getElementById('city').value,
+        phone: document.getElementById('phone').value,
+        email: document.getElementById('email').value,
+        notes: document.getElementById('notes').value,
+        status: "PENDING"
+    };
+
+    const requiredFields = [
+        'fullName', 'country', 'street', 'city', 'phone', 'email'
+    ];
+
+    let isValid = true;
+    let firstInvalidField = null;
+
+    requiredFields.forEach(id => {
+        const field = document.getElementById(id);
+        if (!field.value.trim()) {
+            field.style.border = '2px solid red';
+            if (!firstInvalidField) firstInvalidField = field;
+            isValid = false;
+        } else {
+            field.style.border = '';
+        }
+    });
+
+    if (!isValid) {
+        alert("Vui lòng điền đầy đủ để order nha các tình iuuuuuu!");
+        firstInvalidField.focus();
+        return;
+    }
+
+    const orderDetails = cart.map(item => ({
+        product: {
+            id: item.id,
+            name: item.name
+        },
+        price: item.price,
+        quantity: item.quantity
+    }));
+
+    const data = { order, orderDetails };
+
+    fetch('/api/orders', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+    })
+    .then(res => {
+        if (res.ok) {
+            localStorage.setItem("lastOrder", encodeURIComponent(JSON.stringify({
+                order,
+                orderDetails,
+                paymentMethod
+            })));
+            localStorage.removeItem("cart");
+            window.location.href = "ordersuccess.html";
+        } else {
+            alert("Đặt hàng thất bại!");
+        }
+    })
+    .catch(err => {
+        console.error("Lỗi gửi đơn hàng:", err);
+        alert("Lỗi kết nối máy chủ!");
+    });
+}
+
+window.onload = function () {
+    renderOrderSummary();
+
+    const payment = document.querySelector('input[name="payment"]:checked');
+    const bankInfo = document.getElementById("bank-transfer-info");
+
+    if (payment && payment.value === "Chuyển khoản ngân hàng") {
+        bankInfo.style.display = "block";
+        updateTransferNote();
+    } else {
+        bankInfo.style.display = "none";
+    }
+
+    document.querySelectorAll('input[name="payment"]').forEach(radio => {
+        radio.addEventListener('change', function () {
+            const info = document.getElementById("bank-transfer-info");
+            if (this.value === "Chuyển khoản ngân hàng") {
+                info.style.display = "block";
+                updateTransferNote();
+            } else {
+                info.style.display = "none";
+            }
+        });
+    });
+
+    document.getElementById("fullName").addEventListener("input", updateTransferNote);
+};
+</script>
+
+</body>
+</html>

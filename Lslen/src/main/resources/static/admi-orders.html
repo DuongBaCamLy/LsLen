@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <title>Order Management</title>
+  <style>
+    body { font-family: Arial; padding: 20px; }
+    table { border-collapse: collapse; width: 100%; margin-top: 20px; }
+    th, td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    button { padding: 5px 10px; margin-left: 10px; }
+  </style>
+</head>
+<body>
+  <h2>Danh sách đơn hàng</h2>
+  <table id="order-table">
+    <thead>
+      <tr>
+        <th>ID</th>
+        <th>Full Name</th>
+        <th>Order Day</th>
+        <th>Address</th>
+        <th>Email</th>
+        <th>Action</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    async function fetchOrders() {
+      const res = await fetch('/api/orders');
+      const text = await res.text();
+      console.log("Raw response:", text);
+      const orders = JSON.parse(text);
+
+      const tbody = document.querySelector('#order-table tbody');
+      tbody.innerHTML = '';
+
+      orders.forEach(o => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${o.id}</td>
+          <td>${o.fullName}</td>
+          <td>${new Date(o.orderDate).toLocaleString('vi-VN')}</td>
+          <td>${o.shippingAddress}</td>
+          <td>${o.email}</td>
+          <td>
+            <button onclick="deleteOrder(${o.id})">Xoá</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    async function deleteOrder(id) {
+      if (confirm("Do u want to delete this order #" + id + " không?")) {
+        const res = await fetch('/api/orders/' + id, { method: 'DELETE' });
+        if (res.ok) {
+          alert("Order Deleted!");
+          fetchOrders(); 
+        } else {
+          alert("Delete fail!!!.");
+        }
+      }
+    }
+
+    fetchOrders();
+  </script>
+</body>
+</html>
